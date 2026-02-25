@@ -254,45 +254,57 @@
         <h2 class="section-title">Featured Projects</h2>
       </div>
       <div class="projects-grid">
-        {% for p in projects %}
-        <div class="project-card reveal-up" style="--delay: {{ loop.index0 * 0.1 }}s">
+        <!-- Project 1 -->
+        <div class="project-card reveal-up" style="--delay: 0s">
           <div class="project-img-wrap">
-            {% if p.image_url %}
-            <div class="project-img" style="background-image: url('{{ p.image_url }}')"></div>
-            {% else %}
+            <!-- Replace the background style below to use an image: style="background-image: url('YOUR_IMAGE_URL')" -->
             <div class="project-img"
               style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-base) 100%); display: flex; align-items: center; justify-content: center;">
               <span style="font-size: 3rem; opacity: 0.2;">🌐</span>
             </div>
-            {% endif %}
             <div class="project-overlay">
-              <span class="project-category">{{ p.category }}</span>
+              <span class="project-category">E-Commerce</span>
             </div>
           </div>
           <div class="project-body">
-            <h3 class="project-title">{{ p.client_name }}</h3>
-            <p class="project-desc">{{ p.description }}</p>
-            {% if p.tech_stack %}
+            <h3 class="project-title">The Core Originals</h3>
+            <p class="project-desc">A premium clothing brand e-commerce platform with elegant design and smooth user
+              experience.</p>
             <div class="project-tech">
-              {% for tech in p.tech_stack.split(',') %}
-              <span>{{ tech.strip() }}</span>
-              {% endfor %}
+              <span>Flask</span>
+              <span>Python</span>
+              <span>MySQL</span>
             </div>
-            {% endif %}
-            {% if p.live_url %}
             <div class="project-links">
-              <a href="{{ p.live_url }}" target="_blank" rel="noopener" class="project-link btn-primary-sm">Live Site
-                ↗</a>
+              <a href="#" target="_blank" rel="noopener" class="project-link btn-primary-sm">Live Site ↗</a>
             </div>
-            {% endif %}
           </div>
         </div>
-        {% else %}
-        <div
-          style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border);">
-          <p style="color: var(--text-secondary);">New projects will appear here as they are added.</p>
+
+        <!-- Project 2 -->
+        <div class="project-card reveal-up" style="--delay: 0.1s">
+          <div class="project-img-wrap">
+            <div class="project-img"
+              style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-base) 100%); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 3rem; opacity: 0.2;">🌐</span>
+            </div>
+            <div class="project-overlay">
+              <span class="project-category">Business Website</span>
+            </div>
+          </div>
+          <div class="project-body">
+            <h3 class="project-title">Dosutra</h3>
+            <p class="project-desc">A modern, responsive business website designed to convert visitors and showcase
+              services.</p>
+            <div class="project-tech">
+              <span>HTML/CSS</span>
+              <span>JavaScript</span>
+            </div>
+            <div class="project-links">
+              <a href="#" target="_blank" rel="noopener" class="project-link btn-primary-sm">Live Site ↗</a>
+            </div>
+          </div>
         </div>
-        {% endfor %}
       </div>
     </div>
   </section>
