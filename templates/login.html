@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Aryan Satam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg-base);
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .login-container h2 {
+            font-family: var(--font-head);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="particles-bg"></div>
+
+    <div class="login-container">
+        <h2>🔐 Secure Login</h2>
+        {% if error %}
+        <p class="admin-error mb-2" style="text-align: center; display: block;">{{ error }}</p>
+        {% endif %}
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="admin-field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="admin-input" required autofocus>
+            </div>
+            <div class="admin-field mt-2">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="admin-input" required>
+            </div>
+            <button type="submit" class="btn btn-primary full-width mt-2">Login</button>
+        </form>
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="{{ url_for('index') }}" class="btn-outline btn-sm">← Back to Site</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
