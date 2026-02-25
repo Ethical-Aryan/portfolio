@@ -13,10 +13,10 @@ ADMIN_PASSWORD_HASH = generate_password_hash('aryan2025')
 
 # MySQL Configuration
 db_config = {
-    'user': 'root', # Replace with your MySQL username
-    'password': '', # Replace with your MySQL password
-    'host': 'localhost',
-    'database': 'portfolio',
+    'user': os.environ.get('DB_USER'),
+    'password': os.environ.get('DB_PASSWORD'),
+    'host': os.environ.get('DB_HOST'),
+    'database': os.environ.get('DB_NAME'),
     'autocommit': True
 }
 
@@ -28,7 +28,6 @@ def get_db_connection():
         print(f"Error connecting to MySQL Database: {err}")
         return None
 
-def init_db():
     try:
         # Connect without database first to create it if it doesn't exist
         conn = mysql.connector.connect(
@@ -81,8 +80,6 @@ def init_db():
         print(f"Database initialization failed: {e}")
 
 # Initialize DB on startup
-init_db()
-
 @app.route('/')
 def index():
     conn = get_db_connection()
@@ -192,6 +189,3 @@ def api_projects():
             return jsonify({'message': 'Project deleted successfully'})
         except Exception as e:
             return jsonify({'error': str(e)}), 400
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
