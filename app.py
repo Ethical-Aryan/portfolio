@@ -189,3 +189,5 @@ def api_projects():
             return jsonify({'message': 'Project deleted successfully'})
         except Exception as e:
             return jsonify({'error': str(e)}), 400
+
+

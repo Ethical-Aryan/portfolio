@@ -130,63 +130,123 @@ if (contactForm) {
   });
 }
 
-// ── PARTICLES (lightweight canvas dots) ──────
-(function initParticles() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  const parent = document.getElementById('particles-bg');
-  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
-  parent.appendChild(canvas);
+// ── 3D PARTICLES (VANTA) & TILT EFFECT ──────
+if (typeof VANTA !== 'undefined') {
+  const isMobile = window.innerWidth < 768;
+  VANTA.NET({
+    el: "#particles-bg",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    scale: 1.00,
+    scaleMobile: 1.00,
+    color: 0x63b3ed,
+    backgroundColor: 0x080c14,
+    points: isMobile ? 8.00 : 12.00,
+    maxDistance: isMobile ? 18.00 : 22.00,
+    spacing: isMobile ? 22.00 : 18.00
+  });
+}
 
-  let W, H, dots = [];
-  const N = 55;
+if (typeof VanillaTilt !== 'undefined') {
+  const isMobile = window.innerWidth < 768;
+  VanillaTilt.init(document.querySelectorAll(".project-card, .skill-category, .service-card, .hero-code-card"), {
+    max: isMobile ? 4 : 10,
+    speed: 400,
+    glare: true,
+    "max-glare": 0.15,
+    gyroscope: false // Mobile friendly: disable gyro to save battery and stop jumpiness
+  });
+}
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+// ── LENS SMOOTH SCROLLING ─────────────────────
+if (typeof Lenis !== 'undefined') {
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smooth: true,
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
   }
 
-  function mkDot() {
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: Math.random() * 1.5 + 0.4,
-      dx: (Math.random() - 0.5) * 0.35,
-      dy: (Math.random() - 0.5) * 0.35,
-      a: Math.random() * 0.4 + 0.1,
-    };
-  }
+  requestAnimationFrame(raf);
+}
 
-  resize();
-  dots = Array.from({ length: N }, mkDot);
-  window.addEventListener('resize', resize);
+// ── CUSTOM 3D CURSOR ──────────────────────────
+const cursorDot = document.getElementById('cursor-dot');
+const cursorOutline = document.getElementById('cursor-outline');
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    dots.forEach(d => {
-      d.x += d.dx; d.y += d.dy;
-      if (d.x < 0 || d.x > W) d.dx *= -1;
-      if (d.y < 0 || d.y > H) d.dy *= -1;
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(99,179,237,${d.a})`;
-      ctx.fill();
+if (cursorDot && cursorOutline && window.innerWidth >= 768) {
+  window.addEventListener('mousemove', (e) => {
+    const posX = e.clientX;
+    const posY = e.clientY;
+
+    // Dot follows instantly
+    cursorDot.style.left = `${posX}px`;
+    cursorDot.style.top = `${posY}px`;
+
+    // Outline follows with a slight delay using simple lerp via CSS/JS
+    cursorOutline.animate({
+      left: `${posX}px`,
+      top: `${posY}px`
+    }, { duration: 500, fill: "forwards" });
+  });
+
+  // Add hover effect to links and buttons
+  document.querySelectorAll('a, button, .nav-logo').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+}
+
+// ── MAGNETIC BUTTONS ──────────────────────────
+const magneticBtns = document.querySelectorAll('.btn');
+if (window.innerWidth >= 768) {
+  magneticBtns.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const h = rect.width / 2;
+      const x = e.clientX - rect.left - h;
+      const y = e.clientY - rect.top - h;
+      // Move the button slightly towards the mouse
+      btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
     });
-    // Draw connecting lines
-    for (let i = 0; i < dots.length; i++) {
-      for (let j = i + 1; j < dots.length; j++) {
-        const dist = Math.hypot(dots[i].x - dots[j].x, dots[i].y - dots[j].y);
-        if (dist < 140) {
-          ctx.beginPath();
-          ctx.moveTo(dots[i].x, dots[i].y);
-          ctx.lineTo(dots[j].x, dots[j].y);
-          ctx.strokeStyle = `rgba(99,179,237,${0.06 * (1 - dist / 140)})`;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
+    btn.addEventListener('mouseleave', () => {
+      // Reset position
+      btn.style.transform = `translate(0px, 0px)`;
+    });
+  });
+}
+
+// ── ADVANCED TEXT REVEALS (GSAP + SplitType) ──
+if (typeof SplitType !== 'undefined' && typeof gsap !== 'undefined') {
+  // Add reveal-text class to hero headings for animation
+  const splitElements = document.querySelectorAll('.hero-title, .section-title');
+  splitElements.forEach(el => el.classList.add('reveal-text'));
+
+  const textToSplit = new SplitType('.reveal-text', { types: 'chars, words' });
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  textToSplit.chars.forEach((char) => {
+    gsap.fromTo(char,
+      { y: '115%', opacity: 0 },
+      {
+        y: '0%',
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.05,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: char.closest('.reveal-text'),
+          start: 'top 90%',
         }
       }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
+    );
+  });
+}

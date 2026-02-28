@@ -33,7 +33,7 @@
 }
 
 html {
-  scroll-behavior: smooth
+  /* scroll-behavior: smooth is now handled by LenisJS */
 }
 
 body {
@@ -1664,3 +1664,87 @@ textarea.form-control {
     padding: 4rem 0
   }
 }
+
+/* 3D TILT EFFECTS */
+.project-card,
+.skill-category,
+.service-card,
+.hero-code-card {
+  transform-style: preserve-3d;
+}
+
+.project-card>*,
+.skill-category>*,
+.service-card>*,
+.hero-code-card>* {
+  transform: translateZ(30px);
+}
+
+
+/* MOBILE FRIENDLY REVEAL ANIMATIONS */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-up.visible,
+.reveal-left.visible,
+.reveal-right.visible {
+  opacity: 1;
+  transform: translate(0);
+}
+
+@media (max-width: 768px) {
+  .reveal-up {
+    transform: translateY(20px);
+  }
+
+  .reveal-left {
+    transform: translateX(-20px);
+  }
+
+  .reveal-right {
+    transform: translateX(20px);
+  }
+}
+/* LENIS SMOOTH SCROLL OVERRIDES */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+
+
+/* ---------------- CUSTOM CURSOR ---------------- */
+body { cursor: none; } /* Hide default cursor */
+#cursor-dot, #cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
+#cursor-dot { width: 8px; height: 8px; background-color: var(--accent-1); }
+#cursor-outline { width: 40px; height: 40px; border: 2px solid rgba(99,179,237, 0.5); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+/* Hover state for links/buttons */
+.cursor-hover #cursor-outline { width: 60px; height: 60px; background-color: rgba(99,179,237, 0.1); border-color: transparent; mix-blend-mode: difference; }
+/* Hide custom cursor on mobile */
+@media (max-width: 768px) { body { cursor: auto; } #cursor-dot, #cursor-outline { display: none !important; } }
+
+/* ---------------- GLASSMORPHISM ---------------- */
+.nav-container, .project-card, .skill-category, .service-card, .hero-code-card { background: rgba(13, 19, 33, 0.4) !important; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05) !important; }
+
+/* ---------------- MAGNETIC BUTTONS ---------------- */
+.btn { display: inline-block; /* Required for magnetic translate */ transition: transform 0.2s cubic-bezier(0.1, 0, 0.1, 1), box-shadow 0.2s, background 0.2s; }
+
+/* ---------------- TEXT REVEALS (GSAP) ---------------- */
+.reveal-text { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); line-height: 1.2; }
+.char { transform: translateY(115%); transition: transform 0.5s; } /* Initial split-type state */
+
