@@ -130,123 +130,132 @@ if (contactForm) {
   });
 }
 
-// ── 3D PARTICLES (VANTA) & TILT EFFECT ──────
-if (typeof VANTA !== 'undefined') {
-  const isMobile = window.innerWidth < 768;
-  VANTA.NET({
-    el: "#particles-bg",
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.00,
-    minWidth: 200.00,
-    scale: 1.00,
-    scaleMobile: 1.00,
-    color: 0x63b3ed,
-    backgroundColor: 0x080c14,
-    points: isMobile ? 8.00 : 12.00,
-    maxDistance: isMobile ? 18.00 : 22.00,
-    spacing: isMobile ? 22.00 : 18.00
-  });
-}
+// ── GSAP SCROLL TIMELINE (DARK SIGMA) ─────────
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
 
-if (typeof VanillaTilt !== 'undefined') {
-  const isMobile = window.innerWidth < 768;
-  VanillaTilt.init(document.querySelectorAll(".project-card, .skill-category, .service-card, .hero-code-card"), {
-    max: isMobile ? 4 : 10,
-    speed: 400,
-    glare: true,
-    "max-glare": 0.15,
-    gyroscope: false // Mobile friendly: disable gyro to save battery and stop jumpiness
-  });
-}
+  // Smooth GSAP Canvas Sequence Scrubbing
+  const canvas = document.getElementById("bg-canvas");
+  if (canvas) {
+    const context = canvas.getContext("2d");
+    
+    // Set fixed internal render size for canvas
+    canvas.width = 1280;
+    canvas.height = 720;
+    
+    const frameCount = 240;
+    const currentFrame = index => (
+      `/static/images/frames/frame_${(index + 1).toString().padStart(4, '0')}.jpg`
+    );
 
-// ── LENS SMOOTH SCROLLING ─────────────────────
-if (typeof Lenis !== 'undefined') {
-  const lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smooth: true,
-  });
+    const images = [];
+    const sequence = { frame: 0 };
 
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      img.src = currentFrame(i);
+      images.push(img);
+    }
+
+    gsap.to(sequence, {
+      frame: frameCount - 1,
+      snap: "frame",
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#scroll-timeline",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5
+      },
+      onUpdate: render
+    });
+
+    images[0].onload = render;
+
+    function render() {
+      if(images[sequence.frame] && images[sequence.frame].complete) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        // Canvas is sized via CSS object-fit: cover
+        context.drawImage(images[sequence.frame], 0, 0, canvas.width, canvas.height);
+      }
+    }
   }
 
-  requestAnimationFrame(raf);
+  // Cinematic Scrollytelling Animation
+  const cardsLeft = document.querySelectorAll('.card-left');
+  const cardsRight = document.querySelectorAll('.card-right');
+  const allCards = [...cardsLeft, ...cardsRight];
+
+  allCards.forEach(card => {
+    gsap.fromTo(card,
+      { y: 150, scale: 0.95, opacity: 0 },
+      {
+        y: 0,
+        scale: 1,
+        opacity: 1,
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 85%',
+          end: 'top 35%',
+          scrub: 1.5
+        }
+      }
+    );
+    // Smooth fade out as it scrolls out of view
+    gsap.to(card, {
+      opacity: 0,
+      scale: 0.95,
+      scrollTrigger: {
+        trigger: card,
+        start: 'bottom 40%',
+        end: 'bottom 5%',
+        scrub: 1.5
+      }
+    });
+  });
+
 }
 
-// ── CUSTOM 3D CURSOR ──────────────────────────
-const cursorDot = document.getElementById('cursor-dot');
-const cursorOutline = document.getElementById('cursor-outline');
+// ═══════════════════════ CUSTOM CURSOR ═══════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  let cursorDot = document.getElementById("cursor-dot");
+  let cursorOutline = document.getElementById("cursor-outline");
 
-if (cursorDot && cursorOutline && window.innerWidth >= 768) {
-  window.addEventListener('mousemove', (e) => {
+  // Create cursor elements dynamically if missing from HTML
+  if (!cursorDot) {
+    cursorDot = document.createElement("div");
+    cursorDot.id = "cursor-dot";
+    document.body.appendChild(cursorDot);
+  }
+  if (!cursorOutline) {
+    cursorOutline = document.createElement("div");
+    cursorOutline.id = "cursor-outline";
+    document.body.appendChild(cursorOutline);
+  }
+
+  // Track mouse movement
+  window.addEventListener("mousemove", (e) => {
     const posX = e.clientX;
     const posY = e.clientY;
 
-    // Dot follows instantly
     cursorDot.style.left = `${posX}px`;
     cursorDot.style.top = `${posY}px`;
 
-    // Outline follows with a slight delay using simple lerp via CSS/JS
+    // Smoothly drag outline behind dot
     cursorOutline.animate({
       left: `${posX}px`,
       top: `${posY}px`
     }, { duration: 500, fill: "forwards" });
   });
 
-  // Add hover effect to links and buttons
-  document.querySelectorAll('a, button, .nav-logo').forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-  });
-}
-
-// ── MAGNETIC BUTTONS ──────────────────────────
-const magneticBtns = document.querySelectorAll('.btn');
-if (window.innerWidth >= 768) {
-  magneticBtns.forEach(btn => {
-    btn.addEventListener('mousemove', (e) => {
-      const rect = btn.getBoundingClientRect();
-      const h = rect.width / 2;
-      const x = e.clientX - rect.left - h;
-      const y = e.clientY - rect.top - h;
-      // Move the button slightly towards the mouse
-      btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+  // Add highly visible hover effect on interactive elements
+  const interactiveElements = document.querySelectorAll('a, button, .cinematic-card, .btn');
+  interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      document.body.classList.add('cursor-hover');
     });
-    btn.addEventListener('mouseleave', () => {
-      // Reset position
-      btn.style.transform = `translate(0px, 0px)`;
+    el.addEventListener('mouseleave', () => {
+      document.body.classList.remove('cursor-hover');
     });
   });
-}
-
-// ── ADVANCED TEXT REVEALS (GSAP + SplitType) ──
-if (typeof SplitType !== 'undefined' && typeof gsap !== 'undefined') {
-  // Add reveal-text class to hero headings for animation
-  const splitElements = document.querySelectorAll('.hero-title, .section-title');
-  splitElements.forEach(el => el.classList.add('reveal-text'));
-
-  const textToSplit = new SplitType('.reveal-text', { types: 'chars, words' });
-
-  gsap.registerPlugin(ScrollTrigger);
-
-  textToSplit.chars.forEach((char) => {
-    gsap.fromTo(char,
-      { y: '115%', opacity: 0 },
-      {
-        y: '0%',
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.05,
-        ease: 'power4.out',
-        scrollTrigger: {
-          trigger: char.closest('.reveal-text'),
-          start: 'top 90%',
-        }
-      }
-    );
-  });
-}
+});

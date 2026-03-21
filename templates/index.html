@@ -19,9 +19,15 @@
 </head>
 
 <body>
+  <!-- ════════════ PRELOADER ════════════ -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-logo">&lt;AS/&gt;</div>
+  </div>
 
-  <!-- ═══════════════════════ PARTICLES BG ═══════════════════════ -->
-  <div id="particles-bg" aria-hidden="true"></div>
+  <!-- ═══════════════════════ PINNED HERO CANVAS ═══════════════════════ -->
+  <div id="pinned-hero">
+    <canvas id="bg-canvas"></canvas>
+  </div>
 
   <!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
   <nav id="navbar" role="navigation" aria-label="Main navigation">
@@ -44,8 +50,16 @@
     </div>
   </nav>
 
+  <!-- ═══════════════════════ SCROLL TIMELINE ═══════════════════════ -->
+  <main id="scroll-timeline">
+    <div class="timeline-spacer" id="intro-spacer">
+      <div class="scroll-indicator" aria-hidden="true" style="bottom: 10vh;">
+        <div class="scroll-dot"></div>
+      </div>
+    </div>
+
   <!-- ═══════════════════════ HERO ═══════════════════════ -->
-  <section id="home" class="hero-section">
+  <section id="home" class="floating-card card-left">
     <div class="hero-content">
       <div class="hero-badge reveal-up">Available for Freelance Work 🟢</div>
       <h1 class="hero-title reveal-up">
@@ -100,13 +114,10 @@
 };</code></pre>
       </div>
     </div>
-    <div class="scroll-indicator" aria-hidden="true">
-      <div class="scroll-dot"></div>
-    </div>
   </section>
 
   <!-- ═══════════════════════ ABOUT ═══════════════════════ -->
-  <section id="about" class="section">
+  <section id="about" class="floating-card card-right">
     <div class="container">
       <div class="section-header reveal-up">
         <span class="section-tag">About Me</span>
@@ -148,7 +159,7 @@
   </section>
 
   <!-- ═══════════════════════ SKILLS ═══════════════════════ -->
-  <section id="skills" class="section section-alt">
+  <section id="skills" class="floating-card card-left">
     <div class="container">
       <div class="section-header reveal-up">
         <span class="section-tag">What I Know</span>
@@ -247,15 +258,19 @@
   </section>
 
   <!-- ═══════════════════════ PROJECTS ═══════════════════════ -->
-  <section id="projects" class="section">
+  <section id="projects" class="floating-card card-right">
     <div class="container">
       <div class="section-header reveal-up">
         <span class="section-tag">My Work</span>
         <h2 class="section-title">Featured Projects</h2>
       </div>
-      <div class="projects-grid">
+    </div>
+    
+    <!-- GSAP Horizontal Scroll Wrapper -->
+    <div class="horizontal-scroll-container pb-5" id="projects-horizontal-scroll">
+      <div class="horizontal-scroll-wrapper" id="projects-horizontal-wrapper">
         <!-- Project 1 -->
-        <div class="project-card reveal-up" style="--delay: 0s">
+        <div class="project-card horizontal-card reveal-up" style="--delay: 0s">
           <div class="project-img-wrap">
             <!-- Replace the background style below to use an image: style="background-image: url('YOUR_IMAGE_URL')" -->
             <div class="project-img"
@@ -274,6 +289,9 @@
               <span>Flask</span>
               <span>Python</span>
               <span>MySQL</span>
+              <span>Razorpay</span>
+              <span>HTML/CSS</span>
+              <span>JavaScript</span>
             </div>
             <div class="project-links">
               <a href="https://www.thecoreoriginals.com" target="_blank" rel="noopener"
@@ -283,7 +301,7 @@
         </div>
 
         <!-- Project 2 -->
-        <div class="project-card reveal-up" style="--delay: 0.1s">
+        <div class="project-card horizontal-card reveal-up" style="--delay: 0.1s">
           <div class="project-img-wrap">
             <div class="project-img"
               style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-base) 100%); display: flex; align-items: center; justify-content: center;">
@@ -298,6 +316,10 @@
             <p class="project-desc">A modern, responsive business website designed to convert visitors and showcase
               services.</p>
             <div class="project-tech">
+              <span>Flask</span>
+              <span>Python</span>
+              <span>MySQL</span>
+              <span>Razorpay</span>
               <span>HTML/CSS</span>
               <span>JavaScript</span>
             </div>
@@ -312,7 +334,7 @@
   </section>
 
   <!-- ═══════════════════════ SERVICES ═══════════════════════ -->
-  <section id="services" class="section section-alt">
+  <section id="services" class="floating-card card-left">
     <div class="container">
       <div class="section-header reveal-up">
         <span class="section-tag">What I Offer</span>
@@ -377,7 +399,7 @@
 
 
   <!-- ═══════════════════════ CONTACT ═══════════════════════ -->
-  <section id="contact" class="section section-alt">
+  <section id="contact" class="floating-card card-right">
     <div class="container">
       <div class="section-header reveal-up">
         <span class="section-tag">Get In Touch</span>
@@ -468,6 +490,9 @@
       </div>
     </div>
   </section>
+  
+  <div class="timeline-spacer-end"></div>
+  </main>
 
   <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
   <footer class="footer">
@@ -489,9 +514,6 @@
   <div id="cursor-dot"></div>
   <div id="cursor-outline"></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
   <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
