@@ -1,152 +1,83 @@
-/* ══════════════════════════════════════════
-   ARYAN SATAM PORTFOLIO — main.js
-   - Navbar scroll effect + hamburger
-   - Scroll reveal animations
-   - Animated counters + skill bars
-   - Dynamic Client Work Manager (localStorage)
-   - Contact form handler
-   - Admin auth (password modal)
-══════════════════════════════════════════ */
+// ARYAN SATAM PORTFOLIO — main.js
 
-// ── NAVBAR ──────────────────────────────────────
-const navbar = document.getElementById('navbar');
-const hamburger = document.getElementById('hamburger');
-const navLinks = document.getElementById('nav-links');
-const allNavLinks = document.querySelectorAll('.nav-link');
-
-if (navbar) {
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 30);
-    highlightActiveSection();
-  });
-}
-
-if (hamburger && navLinks) {
-  hamburger.addEventListener('click', () => {
-    const open = navLinks.classList.toggle('open');
-    hamburger.classList.toggle('open', open);
-    hamburger.setAttribute('aria-expanded', open);
-  });
-
-  // Close menu on nav link click (mobile)
-  navLinks.addEventListener('click', e => {
-    if (e.target.closest('.nav-link, .nav-cta')) {
-      navLinks.classList.remove('open');
-      hamburger.classList.remove('open');
-      hamburger.setAttribute('aria-expanded', 'false');
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Lenis Smooth Scroll
+  if (typeof Lenis !== 'undefined') {
+    const lenis = new Lenis({
+      duration: 1.5,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true
+    });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
     }
-  });
-}
+    requestAnimationFrame(raf);
+  }
 
-function highlightActiveSection() {
-  const sections = document.querySelectorAll('section[id]');
-  let current = '';
-  sections.forEach(s => {
-    if (window.scrollY >= s.offsetTop - 110) current = s.id;
-  });
-  allNavLinks.forEach(l => {
-    l.classList.toggle('active', l.getAttribute('href') === `#${current}`);
-  });
-}
+  // 2. Custom Magnetic Cursor (Mix-Blend-Mode)
+  const cursor = document.getElementById("magnetic-cursor");
+  if (cursor && typeof gsap !== 'undefined') {
+    window.addEventListener("mousemove", (e) => {
+      gsap.to(cursor, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.15,
+        ease: "power2.out"
+      });
+    });
 
-// ── SCROLL REVEAL ───────────────────────────────
-const revealEls = document.querySelectorAll('.reveal-up,.reveal-left,.reveal-right');
-const revealObs = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      // Animate skill bars when skills section enters view
-      if (entry.target.classList.contains('skill-category')) {
-        animateSkillBars(entry.target);
-      }
-    }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+    // Expansion hover effect on interactable elements
+    const interactives = document.querySelectorAll('a, button, .tilt-card, .hollow-text, .sub-hollow, .char');
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    });
+  }
 
-revealEls.forEach(el => revealObs.observe(el));
-
-// ── SKILL BARS ──────────────────────────────────
-function animateSkillBars(container) {
-  container.querySelectorAll('.skill-bar-fill').forEach(bar => {
-    const w = bar.getAttribute('data-width');
-    bar.style.width = w + '%';
-  });
-}
-
-// ── COUNTER ANIMATION ───────────────────────────
-function animateCounters() {
-  document.querySelectorAll('.stat-number').forEach(el => {
-    const target = parseInt(el.getAttribute('data-count'), 10);
-    let current = 0;
-    const step = Math.ceil(target / 40);
-    const timer = setInterval(() => {
-      current = Math.min(current + step, target);
-      el.textContent = current;
-      if (current >= target) clearInterval(timer);
-    }, 35);
-  });
-}
-
-// Trigger counters when hero stats come into view
-const statsEl = document.querySelector('.hero-stats');
-if (statsEl) {
-  const statsObs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      animateCounters();
-      statsObs.disconnect();
-    }
-  }, { threshold: 0.5 });
-  statsObs.observe(statsEl);
-}
-
-// ══════════════════════════════════════════════
-// ════════════ CONTACT FORM ════════════════════
-// ══════════════════════════════════════════════
-const contactForm = document.getElementById('contact-form');
-const formSuccess = document.getElementById('form-success');
-const formFail = document.getElementById('form-fail');
-const contactSubmit = document.getElementById('contact-submit');
-
-if (contactForm) {
-  contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    formSuccess.hidden = true;
-    formFail.hidden = true;
-
-    const name = document.getElementById('cf-name').value.trim();
-    const email = document.getElementById('cf-email').value.trim();
-    const budget = document.getElementById('cf-budget').value.trim();
-    const message = document.getElementById('cf-message').value.trim();
-
-    if (!name || !email || !message) return;
-
-    const waMessage = `Hi, I'm ${name}.\nEmail: ${email}` + (budget ? `\nBudget: ${budget}` : '') + `\n\nProject Details:\n${message}`;
-    const waUrl = `https://wa.me/917045464243?text=${encodeURIComponent(waMessage)}`;
-
-    window.open(waUrl, '_blank');
-
-    formSuccess.hidden = false;
-    contactForm.reset();
-  });
-}
-
-// ── GSAP SCROLL TIMELINE (DARK SIGMA) ─────────
-if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-
-  // Smooth GSAP Canvas Sequence Scrubbing
-  const canvas = document.getElementById("bg-canvas");
-  if (canvas) {
-    const context = canvas.getContext("2d");
+  // Text Reveal Logic
+  if (typeof SplitType !== 'undefined' && typeof gsap !== 'undefined') {
+    const text1 = new SplitType('.hollow-text', { types: 'chars' });
+    const text2 = new SplitType('.sub-hollow', { types: 'chars' });
     
-    // Set fixed internal render size for canvas
+    gsap.from(text1.chars, {
+      y: 120, opacity: 0, rotationZ: 10, stagger: 0.04, duration: 1.2, ease: "power4.out", delay: 0.2
+    });
+    
+    gsap.from(text2.chars, {
+      y: 120, opacity: 0, rotationZ: -10, stagger: 0.04, duration: 1.2, ease: "power4.out", delay: 0.4
+    });
+    
+    gsap.from('.hero-bottom-info p', {
+      y: 20, opacity: 0, duration: 1, stagger: 0.2, delay: 1, ease: "power2.out"
+    });
+  }
+
+  // Magnetic Buttons Logic
+  const magneticBtns = document.querySelectorAll('.cyber-btn, .glow-button');
+  magneticBtns.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+    });
+  });
+
+  // 3. 3D Canvas Video Scrubbing (GSAP)
+  const canvas = document.getElementById("bg-canvas");
+  if (canvas && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+    
+    const context = canvas.getContext("2d");
     canvas.width = 1280;
     canvas.height = 720;
     
-    const frameCount = 240;
-    const currentFrame = index => (
-      `/static/images/frames/frame_${(index + 1).toString().padStart(4, '0')}.jpg`
-    );
+    const frameCount = 192;
+    const currentFrame = index => `/static/images/frames/frame_${(index + 1).toString().padStart(4, '0')}.jpg`;
 
     const images = [];
     const sequence = { frame: 0 };
@@ -160,102 +91,72 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.to(sequence, {
       frame: frameCount - 1,
       snap: "frame",
-      ease: "none",
+      ease: "power1.inOut",
       scrollTrigger: {
-        trigger: "#scroll-timeline",
+        trigger: document.body, 
         start: "top top",
         end: "bottom bottom",
-        scrub: 1.5
+        scrub: 2.5
       },
-      onUpdate: render
-    });
-
-    images[0].onload = render;
-
-    function render() {
-      if(images[sequence.frame] && images[sequence.frame].complete) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        // Canvas is sized via CSS object-fit: cover
-        context.drawImage(images[sequence.frame], 0, 0, canvas.width, canvas.height);
-      }
-    }
-  }
-
-  // Cinematic Scrollytelling Animation
-  const cardsLeft = document.querySelectorAll('.card-left');
-  const cardsRight = document.querySelectorAll('.card-right');
-  const allCards = [...cardsLeft, ...cardsRight];
-
-  allCards.forEach(card => {
-    gsap.fromTo(card,
-      { y: 150, scale: 0.95, opacity: 0 },
-      {
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 85%',
-          end: 'top 35%',
-          scrub: 1.5
+      onUpdate: () => {
+        if(images[sequence.frame] && images[sequence.frame].complete) {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(images[sequence.frame], 0, 0, canvas.width, canvas.height);
         }
       }
-    );
-    // Smooth fade out as it scrolls out of view
-    gsap.to(card, {
-      opacity: 0,
-      scale: 0.95,
-      scrollTrigger: {
-        trigger: card,
-        start: 'bottom 40%',
-        end: 'bottom 5%',
-        scrub: 1.5
-      }
     });
-  });
 
-}
+    images[0].onload = () => {
+      context.drawImage(images[0], 0, 0, canvas.width, canvas.height);
+    };
 
-// ═══════════════════════ CUSTOM CURSOR ═══════════════════════
-document.addEventListener("DOMContentLoaded", () => {
-  let cursorDot = document.getElementById("cursor-dot");
-  let cursorOutline = document.getElementById("cursor-outline");
+    // 4. GSAP Reverse-Gravity Reveals for 3D Cards
+    const tiltCards = document.querySelectorAll('.tilt-card');
+    tiltCards.forEach((card) => {
+      gsap.fromTo(card,
+        { y: 150, opacity: 0, rotateX: 10 },
+        {
+          y: 0, opacity: 1, rotateX: 0,
+          duration: 1.2,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
 
-  // Create cursor elements dynamically if missing from HTML
-  if (!cursorDot) {
-    cursorDot = document.createElement("div");
-    cursorDot.id = "cursor-dot";
-    document.body.appendChild(cursorDot);
+    // 6. Services Revel
+    const services = document.querySelectorAll('.service-item');
+    services.forEach((srv, index) => {
+      gsap.fromTo(srv,
+        { x: -50, opacity: 0 },
+        {
+          x: 0, opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: srv,
+            start: "top 90%"
+          }
+        });
+    });
+
+    // 5. Stack Bar fills
+    const stackFills = document.querySelectorAll('.stack-fill');
+    stackFills.forEach(fill => {
+      const width = fill.getAttribute('data-width');
+      gsap.to(fill, {
+        width: width + '%',
+        duration: 1.5,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: fill,
+          start: "top 90%"
+        }
+      });
+    });
   }
-  if (!cursorOutline) {
-    cursorOutline = document.createElement("div");
-    cursorOutline.id = "cursor-outline";
-    document.body.appendChild(cursorOutline);
-  }
-
-  // Track mouse movement
-  window.addEventListener("mousemove", (e) => {
-    const posX = e.clientX;
-    const posY = e.clientY;
-
-    cursorDot.style.left = `${posX}px`;
-    cursorDot.style.top = `${posY}px`;
-
-    // Smoothly drag outline behind dot
-    cursorOutline.animate({
-      left: `${posX}px`,
-      top: `${posY}px`
-    }, { duration: 500, fill: "forwards" });
-  });
-
-  // Add highly visible hover effect on interactive elements
-  const interactiveElements = document.querySelectorAll('a, button, .cinematic-card, .btn');
-  interactiveElements.forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      document.body.classList.add('cursor-hover');
-    });
-    el.addEventListener('mouseleave', () => {
-      document.body.classList.remove('cursor-hover');
-    });
-  });
 });
